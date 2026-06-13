@@ -1,0 +1,6 @@
+# Live market-data fetch for the /analyze-stock pipeline (Stage 0).
+# Install once:  python3 -m pip install -r requirements.txt
+yfinance>=0.2.40
+# Used for the screener.in India-fundamentals scrape (also pulled in by yfinance).
+requests>=2.31
+beautifulsoup4>=4.12

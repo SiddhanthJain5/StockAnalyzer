@@ -1,0 +1,19 @@
+# Pipeline outputs.
+# The verdict + plain-English summary in output/ ARE the deliverable, so they are tracked.
+# Only the bulky intermediate stage files under analysis/ are ignored (regenerated each run).
+analysis/*/
+!analysis/README.md
+# (output/ is intentionally NOT ignored — verdicts and summaries are committed.)
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+*.swp
+
+# Local Claude settings (not the shared command)
+.claude/settings.local.json
