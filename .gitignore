@@ -1,8 +1,11 @@
 # Pipeline outputs.
 # The verdict + plain-English summary in output/ ARE the deliverable, so they are tracked.
 # Only the bulky intermediate stage files under analysis/ are ignored (regenerated each run).
-analysis/*/
-!analysis/README.md
+# Layout: analysis/{stocks,funds}/<NAME>/... and output/{stocks,funds}/<NAME>/...
+analysis/stocks/*/
+analysis/funds/*/
+!analysis/stocks/README.md
+!analysis/funds/README.md
 # (output/ is intentionally NOT ignored — verdicts and summaries are committed.)
 
 # Python

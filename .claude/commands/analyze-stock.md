@@ -39,13 +39,17 @@ separate **output folder**. Later stages read earlier outputs from disk (filesys
      `MARKET=India`.
 3. Compute today's date as `YYYY-MM-DD` (run `date +%F`). Call this `DATE` — used only to
    timestamp content *inside* the reports, never in folder names.
-4. The run uses **one folder per stock, keyed by name only** (no date in the path):
-   - **Analysis folder:** `analysis/<TICKER>/` — holds the six stage files (`01`–`06`).
-   - **Output folder:** `output/<TICKER>/` — holds the final report (`07`).
+4. The run uses **one folder per stock, keyed by name only** (no date in the path), under the
+   **stocks** namespace (mutual funds use the parallel `/analyze-fund` pipeline under
+   `analysis/funds/` and `output/funds/`):
+   - **Analysis folder:** `analysis/stocks/<TICKER>/` — holds the live-data file (`00`) and
+     the six stage files (`01`–`06`).
+   - **Output folder:** `output/stocks/<TICKER>/` — holds the final report (`07`) and the
+     plain-English summary (`08`).
    Run `mkdir -p` on both (a no-op if they already exist).
 5. **New stock vs. existing stock:**
-   - If `analysis/<TICKER>/` did **not** already contain stage files, this is a fresh run —
-     write all six files from scratch.
+   - If `analysis/stocks/<TICKER>/` did **not** already contain stage files, this is a fresh
+     run — write all six files from scratch.
    - If it **did** already contain reports from a previous run, this is a **refresh**:
      overwrite each stage file in place with the new current data, and add a line near the
      top of every updated file — `> Last updated: <DATE>` — so the report reflects the
@@ -53,12 +57,13 @@ separate **output folder**. Later stages read earlier outputs from disk (filesys
 6. **Stage 0 — fetch live data (do this before Stage 1).** Run:
 
    ```
-   python3 scripts/fetch_data.py <LOOKUP_SYMBOL> --outdir analysis/<TICKER>
+   python3 scripts/fetch_data.py <LOOKUP_SYMBOL> --outdir analysis/stocks/<TICKER>
    ```
 
    where `<LOOKUP_SYMBOL>` is the market-normalized symbol (India → `.NS`/`.BO`; US → bare).
-   This writes `analysis/<TICKER>/00-market-data.md` (+ `.json` with full price history) —
-   live quote, valuation, fundamentals, analyst consensus and technicals from Yahoo Finance.
+   This writes `analysis/stocks/<TICKER>/00-market-data.md` (+ `.json` with full price
+   history) — live quote, valuation, fundamentals, analyst consensus and technicals from
+   Yahoo Finance.
    - If it exits non-zero because **yfinance is missing**, run
      `python3 -m pip install -r requirements.txt` once, then retry.
    - If it exits non-zero because the **symbol returned no data**, tell the user the symbol
@@ -223,7 +228,7 @@ structures the output into a clean, analytics-ready dataset.*
 **File sections:** Scraper Design · Target Sites · Extraction Method per site · Output Schema
 (columns · types · provenance) · Signals relevant to the subject stock.
 
-## Stage 7 — Final Verdict → `output/<TICKER>/07-final-recommendation.md`
+## Stage 7 — Final Verdict → `output/stocks/<TICKER>/07-final-recommendation.md`
 **Plugin:** none — pure synthesis. **Reads:** `01`–`06` from the analysis folder.
 
 Read all six stage files from the analysis folder and **synthesize, do not re-derive**.
@@ -240,7 +245,7 @@ these sections:
 7. **Closing line:** this is automated analysis, not personal financial advice; confirm the
    underlying numbers before acting. List any stages that ran in fallback mode.
 
-## Stage 8 — Plain-English Summary → `output/<TICKER>/08-summary.md`
+## Stage 8 — Plain-English Summary → `output/stocks/<TICKER>/08-summary.md`
 **Plugin:** none — pure summarization. **Reads:** `07-final-recommendation.md`.
 
 Read the final report and write a **short, plain-English TL;DR for a non-technical reader.**
@@ -284,6 +289,7 @@ After writing it, this summary — not the long report — is what you point the
 
 Print to the terminal (without requiring the user to open a file):
 - the **Verdict** and **Conviction**,
-- the **plain-English summary path** (`output/<TICKER>/08-summary.md`) — point the user here first,
+- the **plain-English summary path** (`output/stocks/<TICKER>/08-summary.md`) — point the
+  user here first,
 - the **analysis folder path** (stage files) and the **output folder path** (full report + summary),
 - a one-line list of any stages that ran in fallback mode.
