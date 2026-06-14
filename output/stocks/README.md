@@ -6,7 +6,7 @@ Each stock gets **one folder here, keyed by name only** — `<TICKER>/` — hold
 | File | Stage | Reads |
 |------|-------|-------|
 | `07-final-recommendation.md` | Final Verdict | `01`–`06` from `analysis/stocks/<TICKER>/` |
-| `08-summary.md` | Plain-English TL;DR | `07-final-recommendation.md` |
+| `08-summary.md` | Plain-English TL;DR | `01`–`06` + `07-final-recommendation.md` |
 
 Mutual funds use the parallel `/analyze-fund` pipeline → `output/funds/` (see
 `../funds/README.md`).

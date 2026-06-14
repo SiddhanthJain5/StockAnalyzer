@@ -161,6 +161,48 @@ The stages 1–6 of both pipelines call external plugin commands (`data`, `finan
 fallback is recorded in the final report. Confirm installed plugins by typing `/` in Claude
 Code.
 
+---
+
+## Web App
+
+`webapp/` is a small public-facing front end to this project: a one-page site where anyone
+can type in a stock ticker/company name or an Indian mutual fund name and get a **buy / hold
+/ sell** (or **Continue SIP / Hold / Exit**) verdict with a plain-English summary — without
+needing Claude Code, and with **no paid API of any kind**.
+
+It reuses the same Stage-0 data fetchers (`scripts/fetch_data.py`,
+`scripts/fetch_fund_data.py`) as the ground-truth data layer, then replaces the
+Claude-Code-plugin stages (1–8) with `webapp/scoring.py` — a transparent **rules-based
+engine** that scores a fixed set of heuristics (analyst targets, momentum/moving averages,
+valuation, growth, profitability, leverage, and for Indian stocks ROCE/compounded
+growth/screener pros-cons; for funds, CAGR vs category, recent vs long-term trend,
+risk-adjusted return, drawdown, consistency). The score becomes the verdict, conviction, and
+plain-English bullets/risks/guidance — the same shape as the pipeline's final report +
+summary, computed entirely from numbers already fetched. Results are cached on disk per
+ticker/scheme (`CACHE_TTL_SECONDS`, default 1h) so repeat visits don't re-fetch from
+yfinance/screener.in/mfapi.in every time.
+
+### Run locally
+
+```
+python3 -m pip install -r requirements.txt
+uvicorn webapp.main:app --reload
+```
+
+Open <http://127.0.0.1:8000>. No API keys or `.env` file are required.
+
+### Deploy (free tier)
+
+`render.yaml` is a ready-made [Render](https://render.com) blueprint:
+
+1. Push this repo to GitHub.
+2. On Render, **New → Blueprint**, point it at the repo (it picks up `render.yaml`).
+3. Deploy — no secrets to configure.
+
+The free plan is enough for an MVP; `RATE_LIMIT_PER_HOUR` (default 60 requests/IP) and the
+on-disk cache are just good manners toward the free upstream data sources (yfinance,
+screener.in, mfapi.in), since there's no per-request API cost to worry about.
+
 ## Layout
 
 ```
@@ -171,7 +213,15 @@ Code.
 ├── scripts/
 │   ├── fetch_data.py           # Stage 0 for stocks: yfinance + screener.in
 │   └── fetch_fund_data.py      # Stage 0 for funds: mfapi.in (AMFI NAV)
-├── requirements.txt            # yfinance, requests, beautifulsoup4
+├── webapp/                      # public web front end (FastAPI, no paid API)
+│   ├── main.py                  # routes, rate limiting
+│   ├── pipeline.py              # fetch + disk cache
+│   ├── scoring.py                # rules-based verdict/conviction/summary engine
+│   ├── cache/                    # on-disk result cache (git-ignored)
+│   └── static/                  # index.html, style.css, app.js
+├── requirements.txt            # yfinance, requests, beautifulsoup4, fastapi, ...
+├── render.yaml                  # Render deploy blueprint for webapp/
+├── .env.example                 # optional CACHE_TTL_SECONDS / RATE_LIMIT_PER_HOUR overrides
 ├── analysis/
 │   ├── stocks/<TICKER>/        # Stage 0 data + six stage files per stock (git-ignored)
 │   │   └── README.md

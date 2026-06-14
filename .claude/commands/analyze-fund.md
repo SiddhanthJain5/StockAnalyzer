@@ -276,18 +276,64 @@ these sections:
    underlying numbers before acting. List any stages that ran in fallback mode.
 
 ## Stage 8 — Plain-English Summary → `output/funds/<FUND_NAME>/08-summary.md`
-**Plugin:** none — pure summarization. **Reads:** `07-final-recommendation.md`.
+**Plugin:** none — pure summarization. **Reads:** `01`–`06` from the analysis folder and
+`07-final-recommendation.md` from the output folder.
 
-Read the final report and write a **short, plain-English TL;DR for a non-technical reader.**
-This is the file someone opens first — it must be skimmable in 30 seconds.
+Read the final report **and** all six stage files, then write a **short, plain-English
+TL;DR for a non-technical reader.** This is the file someone opens first — it must be
+skimmable in 30 seconds, but it must also surface the *non-obvious* findings the six-stage
+analysis actually produced. Use `07` for the verdict, conviction, and investment guidance;
+use `01`–`06` to mine for the findings described below.
 
-Rules:
+### Surface facts vs. analysis findings
+
+A **surface fact** is anything visible on any fund-tracker app or factsheet within 5
+seconds — current NAV, category (e.g. Flexi Cap), 1Y/3Y/5Y return, expense ratio as a bare
+number, AUM, "beat its benchmark last year." These are fine for orientation but carry almost
+no information about what the six-stage analysis added.
+
+An **analysis finding** is something that required reading multiple stages and connecting
+them — it changes what a surface fact *means*, or surfaces something a 5-second look would
+miss entirely. Generalizable examples (not fund-specific — calibrate to whatever the run
+actually found):
+- **An anomaly plus its explained/unexplained status.** Not "1-year return is down X%"
+  (surface), but "that weak 1-year number is mostly explained by one bad stretch tied to a
+  sector the fund was overweight — whether that's a one-off or a pattern depends on whether
+  the manager has changed positioning since (open question)."
+- **A contradiction between two data sources that shouldn't be combined.** Not "the fund
+  returned X%" (picking one source silently), but "the NAV-derived return and the
+  factsheet's stated return differ because they cover slightly different windows — don't
+  treat them as the same number."
+- **A category-relative or own-history reframe that changes what a number means.** Not
+  "beat its benchmark over 5 years" (surface), but "most of that outperformance happened in
+  one earlier stretch — over the last 1-2 years it has tracked the category average almost
+  exactly, so the long-run number overstates *recent* manager skill."
+- **A structural risk surfaced by cross-referencing two unrelated data points.** Not "the
+  fund has a high expense ratio" (surface-ish), but "combine the expense ratio with how
+  closely its recent returns track the category average, and the fund is increasingly just
+  charging active-management fees for what's become close to index-like performance."
+- **A validation note that changes how alarming a number should feel.** Not just relaying a
+  scary drawdown figure, but "we checked — that drawdown lines up with a broad market-wide
+  correction, not something fund-specific, so it says more about the market than about this
+  fund's risk management."
+
+### Rules
+
 - **No jargon.** If a finance term is unavoidable, add a 3–4 word plain gloss in brackets.
 - **One line per point.** No paragraphs, no tables, no source-file citations.
-- Keep the whole file to **roughly 12–15 lines.** Shorter is better.
+- Keep the whole file to **roughly 18–24 lines.** The "Beyond the headline numbers" section
+  is the point of this file — don't sacrifice it to hit a shorter number, but don't pad
+  either.
 - Plain language a parent or friend could follow; spell out what the numbers *mean*, not just
   what they are (e.g. "grown about 15% a year on average since 2013 — turns ₹1 lakh into
   roughly ₹6 lakh").
+- **Lead with insight, not restatement.** `## In plain English` should orient the reader
+  (what kind of fund this is, and the bottom-line call) — it is **not** a second list of
+  return figures. Cap it at **one** surface-fact bullet.
+- **`## Beyond the headline numbers` is the core deliverable of this file.** Pull
+  **3–5 analysis findings**, each one **contrasting "the obvious read" with "what we found"**
+  in a single line. Cite findings by stage number in parentheses so a curious reader can dig
+  in, e.g. `(Stage 3)`.
 
 Structure (use these exact headings):
 ```
@@ -298,11 +344,16 @@ Structure (use these exact headings):
 **NAV now:** ₹<NAV> (<one phrase of context, e.g. up about 15%/year on average over 5 years>).
 
 ## In plain English
-- <main point 1, one line>
-- <main point 2>
-- <main point 3>
-- <main point 4>
-- <main point 5>  (aim for 4–6 bullets total)
+- <what kind of fund this is and the overall shape of the situation, one line>
+- <at most ONE surface-fact bullet, with plain context>
+- <one line setting up why "Beyond the headline numbers" below is worth reading>
+
+## Beyond the headline numbers
+- <analysis finding 1 — "looks like X, but we found Y" framing> (Stage N)
+- <analysis finding 2> (Stage N)
+- <analysis finding 3> (Stage N)
+- <analysis finding 4, optional> (Stage N)
+- <analysis finding 5, optional> (Stage N)
 
 ## If you're considering it
 - **Investment mode:** <SIP / lumpsum guidance, plain>.
@@ -311,6 +362,18 @@ Structure (use these exact headings):
 
 _Automated analysis, not financial advice. Numbers as of <DATE>; double-check before acting._
 ```
+
+### Edge cases
+
+- **A stage ran in fallback mode but still has rich content:** fallback mode alone is not a
+  reason to skip a stage's findings — judge by content, not by mode.
+- **A stage's content is genuinely thin or templated:** don't force an insight from it —
+  pull from the other stages instead. If across all six stages you truly can't find at
+  least **2** genuine findings, say so plainly (e.g. "Nothing in this run contradicted the
+  obvious read — the headline numbers and the deeper analysis agree.") rather than
+  manufacturing one.
+- **Do not pad** "Beyond the headline numbers" with a restated surface fact just to hit 3
+  bullets — quality and genuine non-obviousness over count.
 
 After writing it, this summary — not the long report — is what you point the user to first.
 

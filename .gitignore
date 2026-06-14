@@ -20,3 +20,7 @@ venv/
 
 # Local Claude settings (not the shared command)
 .claude/settings.local.json
+
+# Web app
+.env
+webapp/cache/

@@ -6,7 +6,7 @@ Each fund gets **one folder here, keyed by name only** — `<FUND_NAME>/` — ho
 | File | Stage | Reads |
 |------|-------|-------|
 | `07-final-recommendation.md` | Final Verdict | `01`–`06` from `analysis/funds/<FUND_NAME>/` |
-| `08-summary.md` | Plain-English TL;DR | `07-final-recommendation.md` |
+| `08-summary.md` | Plain-English TL;DR | `01`–`06` + `07-final-recommendation.md` |
 
 Stocks use the parallel `/analyze-stock` pipeline → `output/stocks/` (see
 `../stocks/README.md`).

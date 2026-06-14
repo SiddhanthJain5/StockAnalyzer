@@ -133,6 +133,30 @@ def fetch_screener(symbol: str) -> dict:
         if entries:
             growth[title] = entries
 
+    # --- Shareholding pattern (promoter/govt, FII, DII, public over recent quarters) ---
+    # For a PSU like CENTRALBK the "Promoters" row IS the government stake — the single
+    # most important float/overhang input for Stages 4-5, and the figure most likely to be
+    # stale in model memory (it moves on every FPO/OFS/QIP). Fetch it live.
+    shareholding = {}
+    shp = soup.select_one("#quarterly-shp table") or soup.select_one("#shareholding table")
+    if shp:
+        cols = [th.get_text(strip=True) for th in shp.select("thead th")][1:]
+        rows = {}
+        for tr in shp.select("tbody tr"):
+            cells = tr.select("td")
+            if not cells:
+                continue
+            label = cells[0].get_text(" ", strip=True).replace("\xa0", " ").strip(" +")
+            vals = [td.get_text(strip=True) for td in cells[1:]]
+            if label and vals:
+                rows[label] = vals
+        n = 6
+        if cols and rows:
+            shareholding = {
+                "columns": cols[-n:],
+                "rows": {k: v[-n:] for k, v in rows.items()},
+            }
+
     # --- Pros / Cons ---
     def bullets(sel):
         box = soup.select_one(sel)
@@ -143,6 +167,7 @@ def fetch_screener(symbol: str) -> dict:
         "basis": "consolidated" if "consolidated" in (used_url or "") else "standalone",
         "key_ratios": key_ratios,
         "quarters": quarters,
+        "shareholding": shareholding,
         "growth": growth,
         "pros": bullets(".pros"),
         "cons": bullets(".cons"),
@@ -370,6 +395,24 @@ def _screener_markdown(sc: dict) -> list[str]:
             if row:
                 name = next(k for k in q["rows"] if k.startswith(label))
                 out.append(f"| {name} | " + " | ".join(row) + " |")
+        out.append("")
+
+    shp = sc.get("shareholding") or {}
+    if shp.get("columns") and shp.get("rows"):
+        cols = shp["columns"]
+        out.append("**Shareholding pattern** (last %d quarters, %%):" % len(cols))
+        out.append("")
+        out.append("| Holder | " + " | ".join(cols) + " |")
+        out.append("|" + "---|" * (len(cols) + 1))
+        # Promoters first (the govt stake for a PSU), then the rest in a stable order.
+        priority = ["Promoters", "FIIs", "DIIs", "Government", "Public", "No. of Shareholders"]
+        ordered = ([k for k in priority if k in shp["rows"]]
+                   + [k for k in shp["rows"] if k not in priority])
+        for label in ordered:
+            out.append(f"| {label} | " + " | ".join(shp["rows"][label]) + " |")
+        out.append("")
+        out.append("> For a PSU bank the **Promoters** row is the **government stake** — the "
+                   "key public-float / supply-overhang input. Use this live figure, not memory.")
         out.append("")
 
     g = sc.get("growth") or {}

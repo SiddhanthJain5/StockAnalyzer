@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Analyzer</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Finance Analyzer</h1>
+      <p class="tagline">
+        Live data, plain-English read. Get a buy / hold / sell or SIP / switch / exit
+        verdict for any stock or Indian mutual fund.
+      </p>
+    </header>
+
+    <form id="analyze-form">
+      <div class="toggle-row" id="type-toggle">
+        <label class="toggle"><input type="radio" name="type" value="stock" checked><span>Stock</span></label>
+        <label class="toggle"><input type="radio" name="type" value="fund"><span>Mutual Fund (India)</span></label>
+      </div>
+
+      <div class="toggle-row" id="market-toggle">
+        <label class="toggle"><input type="radio" name="market" value="india" checked><span>India (NSE)</span></label>
+        <label class="toggle"><input type="radio" name="market" value="us"><span>US</span></label>
+      </div>
+
+      <div class="input-row">
+        <input type="text" id="query" autocomplete="off"
+               placeholder="e.g. RELIANCE, TCS, NVDA, or &quot;Parag Parikh Flexi Cap&quot;" required>
+        <button type="submit" id="submit-btn">Analyze</button>
+      </div>
+    </form>
+
+    <div id="status" class="status" hidden></div>
+    <div id="candidates" hidden></div>
+    <div id="result" hidden></div>
+
+    <footer>
+      <p>
+        Automated analysis from live market/NAV data plus a language model's general
+        knowledge - <strong>not personal financial advice</strong>. Always verify the
+        underlying numbers before acting.
+      </p>
+    </footer>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
